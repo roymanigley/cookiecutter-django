@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "{{ cookiecutter.project_slug }}"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
@@ -86,6 +86,8 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.mfa",
     "allauth.socialaccount",
+    # "allauth.socialaccount.providers.github",
+    # "allauth.socialaccount.providers.openid_connect",
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",
 {%- endif %}
@@ -99,6 +101,39 @@ THIRD_PARTY_APPS = [
     "webpack_loader",
 {%- endif %}
 ]
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     "openid_connect": {
+#         "APPS": [
+#             {
+#                 "provider_id": "openid_connect",
+#                 "name": "openid_connect",
+#                 "client_id": "web-app",
+#                 "secret": "<COPY IT FROM THE KEYCLOAK CLIENT>",
+#                 "settings": {
+#                     "server_url": "http://localhost:8080/auth/realms/django_social_login_keycloak/.well-known/openid-configuration",
+#                 },
+#             }
+#         ]
+#     },
+#     "github": {
+#         "VERIFIED_EMAIL": True,
+#         "APPS": [
+#             {
+#                 "client_id": "50d0a9e0fd33b75c57d3",
+#                 "secret": "6a353d581e94532f073e1c44f47b20017af0ceeb",
+#                 "key": ""
+#             },
+#         ],
+#         "SCOPE": [
+#             "profile",
+#             "email",
+#         ],
+#         "AUTH_PARAMS": {
+#             "access_type": "online",
+#         },
+#     }
+# }
 
 LOCAL_APPS = [
     "{{ cookiecutter.project_slug }}.users",

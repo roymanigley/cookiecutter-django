@@ -78,7 +78,7 @@ def remove_docker_files():
     shutil.rmtree(".devcontainer")
     shutil.rmtree("compose")
 
-    file_names = ["local.yml", "production.yml", ".dockerignore"]
+    file_names = ["local.yml", "production.yml", ".dockerignore", ".env"]
     for file_name in file_names:
         os.remove(file_name)
     if "{{ cookiecutter.editor }}" == "PyCharm":
@@ -379,6 +379,7 @@ def append_to_gitignore_file(ignored_line):
 
 
 def set_flags_in_envs(postgres_user, celery_flower_user, debug=False):
+    local_django_env_path = os.path.join(".env")
     local_django_envs_path = os.path.join(".envs", ".local", ".django")
     production_django_envs_path = os.path.join(".envs", ".production", ".django")
     local_postgres_envs_path = os.path.join(".envs", ".local", ".postgres")
@@ -387,8 +388,10 @@ def set_flags_in_envs(postgres_user, celery_flower_user, debug=False):
     set_django_secret_key(production_django_envs_path)
     set_django_admin_url(production_django_envs_path)
 
+    set_postgres_user(local_django_env_path, value=postgres_user)
+    set_postgres_password(local_django_env_path, value=postgres_user)
     set_postgres_user(local_postgres_envs_path, value=postgres_user)
-    set_postgres_password(local_postgres_envs_path, value=DEBUG_VALUE if debug else None)
+    set_postgres_password(local_postgres_envs_path, value=postgres_user)
     set_postgres_user(production_postgres_envs_path, value=postgres_user)
     set_postgres_password(production_postgres_envs_path, value=DEBUG_VALUE if debug else None)
 

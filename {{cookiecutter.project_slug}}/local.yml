@@ -3,30 +3,58 @@ version: '3'
 volumes:
   {{ cookiecutter.project_slug }}_local_postgres_data: {}
   {{ cookiecutter.project_slug }}_local_postgres_data_backups: {}
+#  {{ cookiecutter.project_slug }}_local_keycloak_db_data: {}
 
 services:
-  django:{% if cookiecutter.use_celery == 'y' %} &django{% endif %}
-    build:
-      context: .
-      dockerfile: ./compose/local/django/Dockerfile
-    image: {{ cookiecutter.project_slug }}_local_django
-    container_name: {{ cookiecutter.project_slug }}_local_django
-    depends_on:
-      - postgres
-      {%- if cookiecutter.use_celery == 'y' %}
-      - redis
-      {%- endif %}
-      {%- if cookiecutter.use_mailpit == 'y' %}
-      - mailpit
-      {%- endif %}
-    volumes:
-      - .:/app:z
-    env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
-    ports:
-      - '8000:8000'
-    command: /start
+  # django:{% if cookiecutter.use_celery == 'y' %} &django{% endif %}
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/local/django/Dockerfile
+  #   image: {{ cookiecutter.project_slug }}_local_django
+  #   container_name: {{ cookiecutter.project_slug }}_local_django
+  #   depends_on:
+  #     - postgres
+  #     {%- if cookiecutter.use_celery == 'y' %}
+  #     - redis
+  #     {%- endif %}
+  #     {%- if cookiecutter.use_mailpit == 'y' %}
+  #     - mailpit
+  #     {%- endif %}
+  #   volumes:
+  #     - .:/app:z
+  #   env_file:
+  #     - ./.envs/.local/.django
+  #     - ./.envs/.local/.postgres
+  #   ports:
+  #     - '8000:8000'
+  #   command: /start
+  #
+  # keycloak-db:
+  #     image: postgres
+  #     volumes:
+  #       - {{ cookiecutter.project_slug }}_local_keycloak_db_data:/var/lib/postgresql/data
+  #     environment:
+  #       POSTGRES_DB: keycloak
+  #       POSTGRES_USER: keycloak
+  #       POSTGRES_PASSWORD: password
+  #
+  # keycloak:
+  #     image: quay.io/keycloak/keycloak:legacy
+  #     environment:
+  #       DB_VENDOR: POSTGRES
+  #       DB_ADDR: postgres
+  #       DB_DATABASE: keycloak
+  #       DB_USER: keycloak
+  #       DB_SCHEMA: public
+  #       DB_PASSWORD: password
+  #       KEYCLOAK_USER: admin
+  #       KEYCLOAK_PASSWORD: admin
+  #       # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+  #       #JDBC_PARAMS: "ssl=true"
+  #     ports:
+  #       - 8080:8080
+  #     depends_on:
+  #       - keycloak-db
 
   postgres:
     build:
@@ -34,6 +62,8 @@ services:
       dockerfile: ./compose/production/postgres/Dockerfile
     image: {{ cookiecutter.project_slug }}_production_postgres
     container_name: {{ cookiecutter.project_slug }}_local_postgres
+    ports:
+      - '5432:5432'
     volumes:
       - {{ cookiecutter.project_slug }}_local_postgres_data:/var/lib/postgresql/data
       - {{ cookiecutter.project_slug }}_local_postgres_data_backups:/backups
